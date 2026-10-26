@@ -9,9 +9,18 @@ import Observation
 @Observable
 class TodoListViewModel {
     
-    var todoList: [TodoItem]
+    var todoList: [TodoItem] = []
     
     init(todoList: [TodoItem] = []) {
-        self.todoList = todoList
+        self.initializeList(todoList: todoList)
     }
+    
+    func initializeList(todoList: [TodoItem]) {
+        if todoList.isEmpty {
+            self.todoList = TodoItem.createList()
+        } else {
+            self.todoList = todoList
+        }
+    }
+    
 }
