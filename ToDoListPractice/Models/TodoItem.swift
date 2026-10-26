@@ -11,6 +11,7 @@ struct TodoItem: Identifiable, Codable {
     var notes: String
     var isCompleted: Bool
     var dueDate: Date?
+    var createdAt = Date()
     var completedAt: Date?
     
     // Created once and shared, since DateFormatter is expensive to create
@@ -33,11 +34,10 @@ struct TodoItem: Identifiable, Codable {
 
     static func createList() -> [TodoItem] {
         let exampleList: [TodoItem] = [
-            TodoItem(title: "title1", notes: "notes1", isCompleted: true, dueDate: stringToDate(date: "10/25/2026"),
-                completedAt: stringToDate(date: "10/25/2026")),
-            TodoItem(title: "title2", notes: "notes2", isCompleted: false, dueDate: stringToDate(date: "10/27/2026"), completedAt: nil),
-            TodoItem(title: "title3", notes: "notes3", isCompleted: false, dueDate: stringToDate(date: "10/25/2026"), completedAt: nil),
-            TodoItem(title: "title4", notes: "notes4", isCompleted: false, dueDate: stringToDate(date: "10/26/2026"), completedAt: nil)]
+            TodoItem(title: "title1", notes: "notes1", isCompleted: true, dueDate: stringToDate(date: "10/25/2026"), createdAt: stringToDate(date: "10/24/2026") ?? Date(), completedAt: stringToDate(date: "10/25/2026")),
+            TodoItem(title: "title2", notes: "notes2", isCompleted: false, dueDate: stringToDate(date: "10/27/2026"), createdAt: stringToDate(date: "10/24/2026") ?? Date(), completedAt: nil),
+            TodoItem(title: "title3", notes: "notes3", isCompleted: false, dueDate: stringToDate(date: "10/25/2026"), createdAt: stringToDate(date: "10/24/2026") ?? Date(), completedAt: nil),
+            TodoItem(title: "title4", notes: "notes4", isCompleted: false, dueDate: stringToDate(date: "10/26/2026"), createdAt: stringToDate(date: "10/24/2026") ?? Date(), completedAt: nil)]
         return exampleList
     }
 }
