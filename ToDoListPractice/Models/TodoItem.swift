@@ -5,16 +5,16 @@
 //  Created by Ronald Brown on 10/25/26.
 //
 import Foundation
-struct TodoItem: Codable {
+struct TodoItem: Identifiable, Codable {
     var id = UUID()
     let title: String
     let notes: String
     var isCompleted: Bool
     let dueDate: Date?
-    let completedAt: Date?
+    var completedAt: Date?
     
     func dateToString(date: Date?) -> String {
-        guard let date = date else { fatalError("Cannot Convert to string")}
+        guard let date = date else { return "" }
         let dateFormat = "MM/dd/yyyy"
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = dateFormat
@@ -24,7 +24,7 @@ struct TodoItem: Codable {
     static func stringToDate(date: String?) -> Date? {
         guard let date else { return nil }
         let dateFormatter = DateFormatter()
-        let dateFormat = "MM-dd-yyyy"
+        let dateFormat = "MM/dd/yyyy"
         dateFormatter.dateFormat = dateFormat
         return dateFormatter.date(from: date)
     }

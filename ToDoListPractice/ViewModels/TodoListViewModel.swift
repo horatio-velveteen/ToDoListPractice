@@ -11,7 +11,7 @@ class TodoListViewModel {
     
     var todoList: [TodoItem]
     
-    init(todoList: [TodoItem]) {
+    init(todoList: [TodoItem] = TodoItem.createList()) {
         self.todoList = todoList
     }
 }
