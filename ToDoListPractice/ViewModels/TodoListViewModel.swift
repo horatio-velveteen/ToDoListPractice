@@ -22,5 +22,12 @@ class TodoListViewModel {
             self.todoList = todoList
         }
     }
-    
+
+    // Looks up by id, since filtered rows don't line up with todoList indexes
+    func toggleCompletion(id: TodoItem.ID) {
+        guard let index = todoList.firstIndex(where: { $0.id == id }) else { return }
+        todoList[index].isCompleted.toggle()
+        todoList[index].completedAt = todoList[index].isCompleted ? Date() : nil
+    }
+
 }

@@ -7,10 +7,8 @@
 import SwiftUI
 
 struct TaskViewHeader: View {
-    // Owned by the parent so the list below the header can react to them
+    // Owned by the parent so the list below the header can react to it
     @Binding var searchText: String
-    @Binding var isExpanded: Bool
-    let taskCount: Int
 
     @FocusState private var isSearchFocused: Bool
 
@@ -23,8 +21,6 @@ struct TaskViewHeader: View {
 
             Text("My tasks")
                 .font(.system(size: 15, weight: .semibold))
-
-            groupHeader
         }
     }
 
@@ -68,27 +64,9 @@ struct TaskViewHeader: View {
         }
         .animation(.easeInOut(duration: 0.15), value: isSearchFocused)
     }
-
-    private var groupHeader: some View {
-        Button {
-            withAnimation { isExpanded.toggle() }
-        } label: {
-            HStack {
-                Text("Your Tasks (\(taskCount))")
-                    .font(.system(size: 15, weight: .medium))
-                Spacer()
-                Image(systemName: "chevron.down")
-                    .rotationEffect(.degrees(isExpanded ? 0 : -90))
-            }
-            .padding(.vertical, 10)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .accessibilityHint(isExpanded ? "Collapses the task list" : "Expands the task list")
-    }
 }
 
 #Preview {
-    TaskViewHeader(searchText: .constant(""), isExpanded: .constant(true), taskCount: 4)
+    TaskViewHeader(searchText: .constant(""))
         .padding()
 }
