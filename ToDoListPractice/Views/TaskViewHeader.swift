@@ -19,7 +19,7 @@ struct TaskViewHeader: View {
             navigationBar
             searchBar
 
-            Text("My tasks")
+            Text("Tasks")
                 .font(.system(size: 15, weight: .semibold))
         }
     }
