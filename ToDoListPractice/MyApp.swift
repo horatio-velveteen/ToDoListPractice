@@ -1,9 +1,10 @@
 import SwiftUI
 
 @main struct MyApp: App {
+    @State private var viewModel = TodoListViewModel(todoList: TodoItem.createList())
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TodoListView(viewModel: viewModel)
         }
     }
 }

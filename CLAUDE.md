@@ -4,7 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A SwiftUI practice to-do list app, currently at the Xcode template stage (`MyApp.swift` entry point → `ContentView`). Single app target, no test target, no Swift packages.
+A SwiftUI practice to-do list app (a learning project). Single app target, no test target, no Swift packages.
+
+## Architecture and roadmap
+
+- MVVM layout under `ToDoListPractice/`: `Models/` (`TodoItem` plus sample data via `TodoItem.createList()`), `ViewModels/` (`@Observable` view models that own state), `Views/`. A `Storage/` folder (a `TaskStore` protocol backed by JSON in the Documents directory) is planned but doesn't exist yet.
+- `MyApp.swift` still launches the template `ContentView`. New screens such as `TodoListView` aren't connected until the app's root view is switched to them.
+- `github-issues.md` is the build plan: 13 issues done in order, each with acceptance criteria and "Depends on" links. Commits/PRs follow one issue at a time and reference the GitHub issue number (e.g. "Add TodoItem model and sample data (#14)"). Before working on a feature, check its acceptance criteria there. The plan expects views to hold no task data themselves (they display view-model state and report taps), editing to happen on a draft copy, and deletion to go by `id`, not index.
+- Because this is a practice project, the user may want hints or explanations instead of finished code. Ask if it's unclear which one they want.
+- `LEARN_LOG.md` is the user's daily learn log (newest first). When asked to update it, add a dated entry with "What changed" (from git log/diff and the session) and "What I learned" (concepts explained or mistakes fixed).
+- When pointing out a problem or something that should change, always give the file and line as `path/to/File.swift:line` (or a range like `:9-14`). If the issue is that something is missing, give the line where it belongs and the line of the requirement it fails (e.g. in `github-issues.md`).
 
 ## Building
 
@@ -28,7 +37,7 @@ There are no tests or linters configured yet. If a test target is added, run a s
 ## Project configuration worth knowing
 
 - **Multiplatform target**: supports iOS, macOS, and visionOS (`SUPPORTED_PLATFORMS = iphoneos iphonesimulator macosx xros xrsimulator`, `SDKROOT = auto`). Code must compile on all of them — guard platform-specific APIs with `#if os(...)`.
-- **Deployment target 27.0** on iOS/macOS, so the latest SwiftUI/Observation/SwiftData APIs are available without availability checks.
+- **Deployment target 27.0** on iOS/macOS/visionOS, so the latest SwiftUI/Observation/SwiftData APIs are available without availability checks.
 - **File-system-synchronized groups** (`PBXFileSystemSynchronizedRootGroup`, project `objectVersion = 90`): any file placed under `ToDoListPractice/` is automatically part of the target. Do not edit `project.pbxproj` to add source files.
 - **Concurrency**: `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` and `SWIFT_APPROACHABLE_CONCURRENCY = YES` — types are main-actor-isolated by default; mark background work explicitly (`nonisolated`, `@concurrent`).
 - `SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES`: each file must import the modules whose members it uses (no relying on transitive imports).

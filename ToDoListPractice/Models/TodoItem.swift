@@ -5,7 +5,7 @@
 //  Created by Ronald Brown on 10/25/26.
 //
 import Foundation
-struct TodoItem: Identifiable, Codable {
+struct TodoItem: Identifiable, Codable, Hashable {
     var id = UUID()
     var title: String
     var notes: String
@@ -22,7 +22,7 @@ struct TodoItem: Identifiable, Codable {
         return dateFormatter
     }()
 
-    func dateToString(date: Date?) -> String {
+    static func dateToString(date: Date?) -> String {
         guard let date = date else { return "" }
         return Self.dateFormatter.string(from: date)
     }
