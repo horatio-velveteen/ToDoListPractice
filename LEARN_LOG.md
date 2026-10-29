@@ -4,9 +4,29 @@ What changed each day and what I learned along the way. Newest first.
 
 ---
 
+## 2026-10-29: Closing out Issue 5 (toggle complete)
+
+**Branch:** `issue-3-task-list` (changes not committed yet)
+**Issues touched:** #5 Toggle task complete / incomplete
+
+### What changed
+- Checked the toggle from Issue 5 and found it was already built in `bb12d7c`. Only the last two acceptance criteria were unverified.
+- **`isCompleted` is now computed** (`var isCompleted: Bool { completedAt != nil }` in `Models/TodoItem.swift`). This is the second fix the ticket suggested for the PR #14 review note. It removes the stored `isCompleted` and the `isCompleted:` argument from the four sample items in `createList()`.
+- `toggleCompletion(id:)` now only sets `completedAt` (`nil` if it was completed, `Date()` if not).
+- Ticked all four acceptance boxes on issue #5 on GitHub.
+
+### What I learned
+- **Two fields that describe one fact can disagree.** `isCompleted` and `completedAt` could say different things. Keeping only `completedAt` and deriving `isCompleted` from it makes a contradiction impossible.
+- **Computed properties are not stored or encoded.** `isCompleted` no longer appears in the memberwise init, and `Codable` skips it. Anything that already saved an `isCompleted` value would need migrating.
+- **Check "already done" before building.** Reading the code first showed most of the ticket was finished.
+- **Test logic without the UI.** Compiling the model and view model with `swiftc` and a tiny `main.swift` printed state after each toggle, with no simulator.
+- `CLAUDE.md` still says `MyApp.swift` launches `ContentView`, but it now launches `TodoListView`.
+
+---
+
 ## 2026-10-27: Task list screen, header, and completing tasks
 
-**Branch:** `issue-3-task-list` (commits `8070c22`, `bb12d7c`)
+**Branch:** `issue-3-task-list` (commits `8070c22`, `bb12d7c`, `7a16c37`)
 **Issues touched:** #3 Task list screen, #4 View model, #5 Toggle complete
 
 ### What changed
@@ -19,6 +39,8 @@ What changed each day and what I learned along the way. Newest first.
   - completed rows greyed and struck through
   - a purple floating add button, not hooked up yet (Issue 6)
 - Fixed the `"flage.fill"` → `"flag.fill"` SF Symbol typo.
+- Changed the header label from "My tasks" to "Tasks", which matches Issue 3's "title says Tasks" criterion.
+- Started this learn log, and added a `CLAUDE.md` rule: after finishing a task, Claude offers to update the log (it doesn't write to it without a yes).
 
 ### What I learned
 - **`@State` vs `@Binding`:** state belongs to the view that *owns* it. When a child (the header) needs to change something the parent's other children (the list) react to, keep the `@State` in the parent and pass a `$binding` down.
@@ -29,6 +51,13 @@ What changed each day and what I learned along the way. Newest first.
 - **Name views for what they are:** a view that also draws rows isn't a "header". Splitting it made each piece reusable (`TaskGroupHeader` is used twice).
 - A misspelled SF Symbol name still compiles. It just shows nothing at runtime.
 - Plan mode: map out the data flow and the files/lines to change *before* coding.
+- **Claude Code sessions:** a session is one conversation, and a new one starts without the previous conversation.
+  - **What carries over:** files, git history, `CLAUDE.md` (read automatically every session) and saved memories.
+  - **Picking an old conversation back up:** `claude --continue` reopens the latest one, and `claude --resume` lets you pick one.
+  - Anything worth keeping should be written to a file.
+- **`CLAUDE.md` is read from the branch you're on.** Commit it, or switching branches can hide the new instructions.
+- **Log learnings before ending a session.** "What changed" can be rebuilt from git, but "what I learned" only exists in the conversation.
+- **When a skill is worth making:** for a long, repeatable procedure. A short rule fits better as a line in `CLAUDE.md`.
 
 ---
 
