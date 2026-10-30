@@ -4,6 +4,29 @@ What changed each day and what I learned along the way. Newest first.
 
 ---
 
+## 2026-10-29: Add task sheet (Issue 6)
+
+**Branch:** `issue-6-add-task-sheet` (changes not committed yet)
+**Issues touched:** #6 Add task sheet
+
+### What changed
+- **New `ViewModels/TaskEditorViewModel.swift`:** holds the draft `title`, `notes` and `dueDate`. `canSave` is false when the trimmed title is empty, and `makeItem()` builds a `TodoItem` with the trimmed title.
+- **New `Views/AddTaskSheet.swift`:** a form with Title and Notes fields, plus Cancel and Save buttons. Save is `.disabled(!viewModel.canSave)`. Focus is set in `.task` so the keyboard opens when the sheet appears.
+- **`TodoListViewModel.add(_:)`** inserts the new task at the top of the list.
+- **`TodoListView`:** the "+" button sets `isAddingTask`, and a `.sheet` shows `AddTaskSheet` and calls `viewModel.add` on save.
+- Renamed `index` to `selectedTask` in `toggleCompletion(id:)`.
+- Built for iOS Simulator and macOS. Not yet checked by hand in the simulator.
+
+### What I learned
+- **Edit a draft, not the real data.** The sheet works on its own `TaskEditorViewModel` and only hands back a finished `TodoItem` through the `onSave` closure. Cancel never calls it, so nothing is added.
+- **Callbacks go from parent to child.** `AddTaskSheet` doesn't know about `TodoListViewModel`; the parent passes in `onSave`.
+- **`@State` on the sheet gives a fresh draft each time.** The sheet is rebuilt on every presentation, so a cancelled draft doesn't carry over.
+- **Trim with `.whitespacesAndNewlines`** so a title of only spaces or newlines counts as empty, and trim again when saving so "  Buy milk " is stored as "Buy milk".
+- **`@FocusState` + `.task`** opens the keyboard automatically. If `.onAppear` is ignored inside a sheet, `.task` is the fallback.
+- **One `@FocusState` Bool on two fields:** the Title and Notes fields share `isFieldFocused`, so the same Bool is true when either is focused and tells you nothing about which one. An enum-based `@FocusState` tracks them separately.
+
+---
+
 ## 2026-10-29: Closing out Issue 5 (toggle complete)
 
 **Branch:** `issue-3-task-list` (changes not committed yet)
