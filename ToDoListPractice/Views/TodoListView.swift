@@ -10,6 +10,7 @@ struct TodoListView: View {
     @State private var searchText = ""
     @State private var showActive = true
     @State private var showCompleted = true
+    @State private var isAddingTask = false
 
     // Search only changes what is visible, never the stored data
     private var visibleTasks: [TodoItem] {
@@ -51,11 +52,14 @@ struct TodoListView: View {
         .overlay(alignment: .bottomTrailing) {
             addTaskButton
         }
+        .sheet(isPresented: $isAddingTask) {
+            AddTaskSheet(onSave: { item in viewModel.add(item) })
+        }
     }
 
-    // Opens the Add task sheet once Issue 6 is built
     private var addTaskButton: some View {
         Button {
+            isAddingTask = true
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 22, weight: .semibold))
