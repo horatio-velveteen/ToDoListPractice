@@ -33,11 +33,9 @@ class TodoListViewModel {
         todoList.insert(item, at: 0)
     }
 
-    #if DEBUG
-    // TEMPORARY (#7): debug only, remove
-    func clearAll() {
-        todoList.removeAll()
+    // Removes by id, since filtered rows don't line up with todoList indexes; no-op if the id is gone
+    func delete(id: TodoItem.ID) {
+        todoList.removeAll { $0.id == id }
     }
-    #endif
 
 }

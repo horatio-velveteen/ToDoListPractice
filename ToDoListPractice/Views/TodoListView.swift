@@ -45,48 +45,58 @@ struct TodoListView: View {
                     }
             }
         }
-        #if DEBUG
-        // TEMPORARY (#7): debug only, remove
-        .overlay(alignment: .bottomLeading) {
-            Button("Clear all") {
-                viewModel.clearAll()
-            }
-            .buttonStyle(.bordered)
-            .padding(20)
-        }
-        #endif
         .sheet(isPresented: $isAddingTask) {
             AddTaskSheet(onSave: { item in viewModel.add(item) })
         }
     }
 
     private var taskListContent: some View {
-        ScrollView {
+        // A List (not ScrollView) because swipeActions only work on List rows
+        List {
+            TaskViewHeader(searchText: $searchText)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 12)
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+
+            // Divider lives inside the header row so no row exists just for a 1pt line
             VStack(alignment: .leading, spacing: 0) {
-                TaskViewHeader(searchText: $searchText)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                    .padding(.bottom, 12)
-
                 Divider()
-
                 TaskGroupHeader(title: "Your Tasks", count: activeTasks.count, isExpanded: $showActive)
-                if showActive {
-                    taskListView(tasks: activeTasks, onToggle: { id in viewModel.toggleCompletion(id: id) })
-                }
+            }
+            .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+            if showActive {
+                taskListView(
+                    tasks: activeTasks,
+                    onToggle: { id in viewModel.toggleCompletion(id: id) },
+                    onDelete: { id in withAnimation { viewModel.delete(id: id) } }
+                )
+            }
 
-                if !completedTasks.isEmpty {
+            if !completedTasks.isEmpty {
+                VStack(alignment: .leading, spacing: 0) {
                     Divider()
                         .padding(.top, 8)
                     TaskGroupHeader(title: "Completed", count: completedTasks.count, isExpanded: $showCompleted)
-                    if showCompleted {
-                        taskListView(tasks: completedTasks, onToggle: { id in viewModel.toggleCompletion(id: id) })
-                    }
+                }
+                .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+                if showCompleted {
+                    taskListView(
+                        tasks: completedTasks,
+                        onToggle: { id in viewModel.toggleCompletion(id: id) },
+                        onDelete: { id in withAnimation { viewModel.delete(id: id) } }
+                    )
                 }
             }
-            // Leaves room so the add button never covers the last row
-            .padding(.bottom, 88)
         }
+        .listStyle(.plain)
+        // Default minimum row height (~44pt) would pad short rows; ScrollView layout had none
+        .environment(\.defaultMinListRowHeight, 0)
+        // Leaves room so the add button never covers the last row
+        .contentMargins(.bottom, 88, for: .scrollContent)
     }
 
     private var addTaskButton: some View {
@@ -177,10 +187,29 @@ struct ItemView: View {
 struct taskListView: View {
     let tasks: [TodoItem]
     var onToggle: (TodoItem.ID) -> Void
+    var onDelete: (TodoItem.ID) -> Void
 
     var body: some View {
         ForEach(tasks, id: \.id) { todo in
             ItemView(item: todo, onToggle: { onToggle(todo.id) })
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
+                // Only reports the id; the view model does the removing
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        onDelete(todo.id)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                // Mouse alternative on macOS, where swiping isn't available
+                .contextMenu {
+                    Button(role: .destructive) {
+                        onDelete(todo.id)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
         }
     }
 }
