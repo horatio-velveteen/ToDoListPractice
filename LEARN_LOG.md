@@ -4,9 +4,50 @@ What changed each day and what I learned along the way. Newest first.
 
 ---
 
+## 2026-11-01: Empty state (Issue 7)
+
+**Branch:** `issue-7-empty-state`
+**Issues touched:** #7 Empty state
+
+### What changed
+- **`TodoListView`:** the body is now a `Group` that shows a `ContentUnavailableView` ("No Tasks", an "Add Task" button) when `viewModel.todoList.isEmpty`, and the normal list otherwise. The search header and the floating "+" button are hidden while empty, so the empty-state button is the only add action. `.sheet` stays on the outer `Group` so it opens from either state.
+- **`TodoListViewModel.clearAll()`:** a temporary debug method, wrapped in `#if DEBUG` and marked TEMPORARY. A matching "Clear all" button sits in an overlay so the empty state can be reached, since the app always launches with sample data.
+- **Tooling:** added a `build-from-issue` skill that runs the planner, builder, tester and reviewer agents on an issue (kept in `.claude/`, not part of this PR). Used it on this issue.
+- Built for iOS Simulator and macOS (both `BUILD SUCCEEDED`) and checked the empty state, add, clear and cancel by hand.
+
+### What I learned
+- **Key the empty check off the real data, not the filtered list.** Using `todoList.isEmpty` instead of the search results means a search with no matches doesn't show "No Tasks".
+- **`ContentUnavailableView` is built in** (iOS 17+), so with a 27.0 deployment target it needs no availability check.
+- **`#if DEBUG` keeps temporary code out of Release.** Both the method and the button are wrapped, so a Release build can't reach `clearAll()`.
+- **Attach modifiers to the view that exists in every branch.** `.sheet` on the outer `Group` works in both states, while the "+" overlay sits only on the list branch, which is what hides it when empty.
+- **State outside the data survives changes to it.** `searchText` isn't reset by "Clear all", so an old search can hide a newly added task. Worth thinking about when it should reset.
+- **"No test target" shapes verification.** The agents couldn't run the UI, so UI-only criteria became a manual checklist instead of a builder loop.
+
+---
+
+## 2026-10-31: Rebase and merge the add task sheet PR (#18)
+
+**Branch:** `issue-6-add-task-sheet` (squash-merged into `main` as `3fe29d2`)
+**Issues touched:** #6 Add task sheet
+
+### What changed
+- **Rebased the branch onto `main`:** PR #18 showed conflicts because the branch was cut from `issue-5-toggle-complete`, which had since been squash-merged as #17 (`bc2623a`). Ran `git rebase --onto origin/main 3c50831 issue-6-add-task-sheet` to drop the two old #5 commits, then `git push --force-with-lease`. The diff went from 144 to 106 added lines.
+- Rebuilt for iOS Simulator and macOS after the rebase (both `BUILD SUCCEEDED`).
+- Added a "draft-copy pattern" and an "`isCompleted` is derived" bullet to `CLAUDE.md`.
+- Rewrote the PR #18 body to match the rebased branch, then squash-merged it.
+
+### What I learned
+- **A squash merge gives the same content new SHAs.** Git can't tell the original #5 commits are already in `main`, so a branch stacked on them looks like it repeats the work and conflicts.
+- **`git rebase --onto <new base> <old base> <branch>`** moves only the commits after the old base, which is how to un-stack a branch.
+- **Use `--force-with-lease`, not `--force`.** It refuses to overwrite the remote if someone else pushed in the meantime.
+- **Check the diff after a rebase.** `git diff --stat origin/main...HEAD` confirms only the intended files remain.
+- **One-way vs two-way door:** a squash merge into `main` is easy to revert, but the stacked history was the thing to fix before merging.
+
+---
+
 ## 2026-10-29: Add task sheet (Issue 6)
 
-**Branch:** `issue-6-add-task-sheet` (changes not committed yet)
+**Branch:** `issue-6-add-task-sheet` (merged in #18)
 **Issues touched:** #6 Add task sheet
 
 ### What changed

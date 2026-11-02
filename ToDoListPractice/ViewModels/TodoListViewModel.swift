@@ -33,4 +33,11 @@ class TodoListViewModel {
         todoList.insert(item, at: 0)
     }
 
+    #if DEBUG
+    // TEMPORARY (#7): debug only, remove
+    func clearAll() {
+        todoList.removeAll()
+    }
+    #endif
+
 }

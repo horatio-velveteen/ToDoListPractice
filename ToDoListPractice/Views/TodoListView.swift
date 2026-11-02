@@ -23,6 +23,44 @@ struct TodoListView: View {
     private var completedTasks: [TodoItem] { visibleTasks.filter { $0.isCompleted } }
 
     var body: some View {
+        Group {
+            // Keys off the stored list, not visibleTasks, so a search with no matches isn't "no tasks"
+            if viewModel.todoList.isEmpty {
+                ContentUnavailableView {
+                    Label("No Tasks", systemImage: "checklist")
+                } description: {
+                    Text("Add your first task to get started")
+                } actions: {
+                    Button("Add Task") {
+                        isAddingTask = true
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                    .accessibilityLabel("Add task")
+                }
+            } else {
+                taskListContent
+                    .overlay(alignment: .bottomTrailing) {
+                        addTaskButton
+                    }
+            }
+        }
+        #if DEBUG
+        // TEMPORARY (#7): debug only, remove
+        .overlay(alignment: .bottomLeading) {
+            Button("Clear all") {
+                viewModel.clearAll()
+            }
+            .buttonStyle(.bordered)
+            .padding(20)
+        }
+        #endif
+        .sheet(isPresented: $isAddingTask) {
+            AddTaskSheet(onSave: { item in viewModel.add(item) })
+        }
+    }
+
+    private var taskListContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 TaskViewHeader(searchText: $searchText)
@@ -48,12 +86,6 @@ struct TodoListView: View {
             }
             // Leaves room so the add button never covers the last row
             .padding(.bottom, 88)
-        }
-        .overlay(alignment: .bottomTrailing) {
-            addTaskButton
-        }
-        .sheet(isPresented: $isAddingTask) {
-            AddTaskSheet(onSave: { item in viewModel.add(item) })
         }
     }
 
