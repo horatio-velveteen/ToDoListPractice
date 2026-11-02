@@ -4,6 +4,27 @@ What changed each day and what I learned along the way. Newest first.
 
 ---
 
+## 2026-11-01: Swipe to delete (Issue 8)
+
+**Branch:** `issue-8-swipe-to-delete`
+**Issues touched:** #8 Swipe to delete
+
+### What changed
+- **`TodoListViewModel.delete(id:)`:** removes a task with `todoList.removeAll { $0.id == id }`. It does nothing if the id isn't there. Removed the temporary DEBUG `clearAll()` from #7, since real deletion now reaches the empty state.
+- **`TodoListView`:** the `ScrollView` is now a `List`. Each row has a trailing `.swipeActions` with a destructive "Delete" button (trash icon plus text), and a `.contextMenu` Delete for mouse users on macOS. The row only reports `todo.id`; the view holds no task data. Removed the "Clear all" button.
+- **Keeping the old look in the `List`:** each `Divider` moved into the same row as its group header, `defaultMinListRowHeight` is 0, rows have zero insets and hidden separators, and `.contentMargins(.bottom, 88, for: .scrollContent)` keeps the last row clear of the "+" button.
+- Branched from `main` after #19 merged. Ran the `build-from-issue` skill; the reviewer sent it back once for the divider rows, then approved. Built for iOS Simulator and macOS (both `BUILD SUCCEEDED`) and ran the manual checklist by hand.
+
+### What I learned
+- **`.swipeActions` only works on `List` rows.** A `ScrollView` with a `VStack` has no rows to swipe, so the list had to change type.
+- **Delete by `id`, not by index.** `.onDelete` hands you an `IndexSet` of positions in the list it's attached to. Here the rows come from filtered arrays (`activeTasks`, `completedTasks`), so those positions don't match `todoList` and the wrong task would go.
+- **`role: .destructive` gives the red tint** and the right accessibility behaviour without styling it yourself.
+- **Every view in a `List` can become its own row.** A lone `Divider()` got a row of its own with a minimum height of about 44pt. Putting it inside the header row, and setting `defaultMinListRowHeight` to 0, keeps the old spacing.
+- **A full swipe deletes with no confirmation** (`allowsFullSwipe: true`). That's fine for this issue, but it's a choice to make on purpose.
+- **Don't trust an agent's claim about a file; check it.** One builder said it had dropped `.listRowSeparator(.hidden)`, and reading the file showed it was still there.
+
+---
+
 ## 2026-11-01: Empty state (Issue 7)
 
 **Branch:** `issue-7-empty-state`
